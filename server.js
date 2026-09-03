@@ -21,6 +21,9 @@ import reportRoutes from './src/routes/reportRoutes.js';
 import settingsRoutes from './src/routes/settingsRoutes.js';
 import userRoutes from './src/routes/userRoutes.js';
 import authRoutes from './src/routes/authRoutes.js';
+import eventTypeRoutes from './src/routes/eventTypeRoutes.js';
+import inventoryRoutes from './src/routes/inventoryRoutes.js';
+import quotationRoutes from './src/routes/quotationRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -64,6 +67,9 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/event-types', eventTypeRoutes);
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/quotations', quotationRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
