@@ -1,7 +1,6 @@
-import { Request, Response } from 'express';
-import { UserModel, UserRole } from '../models/User.js';
+import { UserModel } from '../models/User.js';
 
-export const ROLE_DEFAULT_PERMISSIONS: Record<UserRole, string[]> = {
+export const ROLE_DEFAULT_PERMISSIONS = {
   'Super Admin': [
     'events:view',
     'events:create',
@@ -61,7 +60,7 @@ export const ROLE_DEFAULT_PERMISSIONS: Record<UserRole, string[]> = {
   'Read Only': ['events:view', 'calendar:view'],
 };
 
-export const getUsers = async (req: Request, res: Response): Promise<void> => {
+export const getUsers = async (req, res) => {
   try {
     const users = await UserModel.find().sort({ createdAt: -1 });
     res.json(users);
@@ -70,7 +69,7 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getUserById = async (req: Request, res: Response): Promise<void> => {
+export const getUserById = async (req, res) => {
   try {
     const user = await UserModel.findOne({ id: req.params.id });
     if (!user) {
@@ -83,7 +82,7 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-export const createUser = async (req: Request, res: Response): Promise<void> => {
+export const createUser = async (req, res) => {
   try {
     let newId = req.body.id;
     if (!newId) {
@@ -95,14 +94,14 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       }
     }
 
-    const role: UserRole = req.body.role || 'Event Director';
+    const role = req.body.role || 'Event Director';
     const permissions =
       req.body.permissions && req.body.permissions.length > 0
         ? req.body.permissions
         : ROLE_DEFAULT_PERMISSIONS[role] || [];
 
     const initials = req.body.name
-      ? req.body.name.split(' ').map((p: string) => p[0]).join('').slice(0, 2).toUpperCase()
+      ? req.body.name.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase()
       : 'U';
 
     const user = new UserModel({
@@ -120,7 +119,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-export const updateUser = async (req: Request, res: Response): Promise<void> => {
+export const updateUser = async (req, res) => {
   try {
     const updated = await UserModel.findOneAndUpdate(
       { id: req.params.id },
@@ -137,7 +136,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-export const deleteUser = async (req: Request, res: Response): Promise<void> => {
+export const deleteUser = async (req, res) => {
   try {
     const deleted = await UserModel.findOneAndDelete({ id: req.params.id });
     if (!deleted) {
@@ -150,6 +149,6 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-export const getRolesMatrix = async (_req: Request, res: Response): Promise<void> => {
+export const getRolesMatrix = async (_req, res) => {
   res.json(ROLE_DEFAULT_PERMISSIONS);
 };

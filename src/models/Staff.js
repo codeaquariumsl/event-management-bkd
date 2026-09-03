@@ -1,31 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface IStaff extends Document {
-  id: string;
-  name: string;
-  avatar?: string;
-  phone: string;
-  email: string;
-  role: 'DJ' | 'Sound Engineer' | 'Lighting Technician' | 'LED Technician' | 'Event Manager' | 'Driver' | 'Assistant' | 'Other';
-  skills: string[];
-  employmentType: 'Full Time' | 'Part Time' | 'Freelance' | 'Contract';
-  status: 'Active' | 'On Leave' | 'Inactive';
-  joiningDate: string;
-  basicSalary: number;
-  defaultRatePerEvent: number;
-  bankDetails?: {
-    bankName: string;
-    accountNumber: string;
-    branch: string;
-  };
-  notes?: string;
-  totalEventsAssigned: number;
-  totalEventsCompleted: number;
-  totalEarnings: number;
-  pendingPayments: number;
-}
-
-const StaffSchema: Schema = new Schema(
+const StaffSchema = new Schema(
   {
     id: { type: String, required: true, unique: true },
     name: { type: String, required: true },
@@ -65,7 +40,7 @@ const StaffSchema: Schema = new Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (_, ret: any) => {
+      transform: (_, ret) => {
         delete ret._id;
         delete ret.__v;
         return ret;
@@ -74,4 +49,4 @@ const StaffSchema: Schema = new Schema(
   }
 );
 
-export const StaffModel = mongoose.model<IStaff>('Staff', StaffSchema);
+export const StaffModel = mongoose.model('Staff', StaffSchema);

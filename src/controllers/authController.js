@@ -1,11 +1,10 @@
-import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { UserModel } from '../models/User.js';
 
 // In-memory token-to-user cache for active sessions
-const sessionStore = new Map<string, { userId: string; expiresAt: number }>();
+const sessionStore = new Map();
 
-export const login = async (req: Request, res: Response): Promise<void> => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -65,7 +64,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getMe = async (req: Request, res: Response): Promise<void> => {
+export const getMe = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -81,7 +80,6 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
     if (session && session.expiresAt > Date.now()) {
       user = await UserModel.findOne({ id: session.userId });
     } else {
-      // Fallback: check if token has user hint or fetch default superadmin
       user = await UserModel.findOne({ email: 'admin@seekersentertainment.lk' });
     }
 
@@ -108,7 +106,7 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const logout = async (req: Request, res: Response): Promise<void> => {
+export const logout = async (req, res) => {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];

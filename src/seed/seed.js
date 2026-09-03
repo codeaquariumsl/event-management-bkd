@@ -7,10 +7,8 @@ import { RecurringEventModel } from '../models/RecurringEvent.js';
 import { CustomerPaymentModel, StaffPaymentModel } from '../models/Payment.js';
 import { CompanyProfileModel, ServiceCatalogModel } from '../models/CompanyProfile.js';
 import { UserModel } from '../models/User.js';
-import { ROLE_DEFAULT_PERMISSIONS } from '../controllers/userController.js';
 
 dotenv.config();
-
 
 async function seed() {
   const uri = process.env.MONGODB_URI;

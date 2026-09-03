@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const connectDB = async (): Promise<void> => {
+export const connectDB = async () => {
   try {
     const mongoURI = process.env.MONGODB_URI;
     if (!mongoURI || mongoURI.includes('username:password@cluster')) {
@@ -16,6 +16,5 @@ export const connectDB = async (): Promise<void> => {
     console.log(`✅ MongoDB Connected Successfully: ${conn.connection.host}`);
   } catch (error) {
     console.error('❌ MongoDB Connection Error:', error);
-    // Don't crash immediately in dev to allow server to boot and display clear instructions
   }
 };

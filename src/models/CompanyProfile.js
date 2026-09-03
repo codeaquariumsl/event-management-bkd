@@ -1,20 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
-
-export interface ICompanyProfile extends Document {
-  name: string;
-  tagline: string;
-  email: string;
-  phone: string;
-  address: string;
-  taxNumber: string;
-  businessRegistration: string;
-  currency: string;
-  bankName: string;
-  bankAccount: string;
-  bankBranch: string;
-  logoUrl?: string;
-  invoiceTerms: string;
-}
+import mongoose, { Schema } from 'mongoose';
 
 const CompanyProfileSchema = new Schema(
   {
@@ -35,7 +19,7 @@ const CompanyProfileSchema = new Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (_, ret: any) => {
+      transform: (_, ret) => {
         delete ret._id;
         delete ret.__v;
         return ret;
@@ -44,15 +28,7 @@ const CompanyProfileSchema = new Schema(
   }
 );
 
-export const CompanyProfileModel = mongoose.model<ICompanyProfile>('CompanyProfile', CompanyProfileSchema);
-
-export interface IServiceCatalogItem extends Document {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
-  unitPrice: number;
-}
+export const CompanyProfileModel = mongoose.model('CompanyProfile', CompanyProfileSchema);
 
 const ServiceCatalogSchema = new Schema(
   {
@@ -65,7 +41,7 @@ const ServiceCatalogSchema = new Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (_, ret: any) => {
+      transform: (_, ret) => {
         delete ret._id;
         delete ret.__v;
         return ret;
@@ -74,4 +50,4 @@ const ServiceCatalogSchema = new Schema(
   }
 );
 
-export const ServiceCatalogModel = mongoose.model<IServiceCatalogItem>('ServiceCatalog', ServiceCatalogSchema);
+export const ServiceCatalogModel = mongoose.model('ServiceCatalog', ServiceCatalogSchema);

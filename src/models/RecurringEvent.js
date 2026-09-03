@@ -1,29 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { IServiceItem } from './Event';
-
-export interface IRecurringEvent extends Document {
-  id: string;
-  seriesName: string;
-  customerId: string;
-  customerName: string;
-  eventType: string;
-  frequency: 'Daily' | 'Weekly' | 'Biweekly' | 'Monthly' | 'Custom';
-  startDate: string;
-  endDate: string;
-  eventDay?: string;
-  startTime: string;
-  endTime: string;
-  location: string;
-  defaultPrice: number;
-  paymentTerms: string;
-  services: IServiceItem[];
-  assignedStaffIds: string[];
-  status: 'Active' | 'Paused' | 'Completed';
-  generatedCount: number;
-  lastGeneratedDate?: string;
-  notes?: string;
-  createdAt: string;
-}
+import mongoose, { Schema } from 'mongoose';
 
 const RecurringEventSchema = new Schema(
   {
@@ -60,7 +35,7 @@ const RecurringEventSchema = new Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (_, ret: any) => {
+      transform: (_, ret) => {
         delete ret._id;
         delete ret.__v;
         return ret;
@@ -69,4 +44,4 @@ const RecurringEventSchema = new Schema(
   }
 );
 
-export const RecurringEventModel = mongoose.model<IRecurringEvent>('RecurringEvent', RecurringEventSchema);
+export const RecurringEventModel = mongoose.model('RecurringEvent', RecurringEventSchema);

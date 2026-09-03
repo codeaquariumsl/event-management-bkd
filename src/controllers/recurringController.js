@@ -1,9 +1,8 @@
-import { Request, Response } from 'express';
 import { RecurringEventModel } from '../models/RecurringEvent.js';
 import { EventModel } from '../models/Event.js';
 import { StaffModel } from '../models/Staff.js';
 
-export const getRecurringEvents = async (req: Request, res: Response): Promise<void> => {
+export const getRecurringEvents = async (req, res) => {
   try {
     const list = await RecurringEventModel.find().sort({ createdAt: -1 });
     res.json(list);
@@ -12,7 +11,7 @@ export const getRecurringEvents = async (req: Request, res: Response): Promise<v
   }
 };
 
-export const createRecurringEvent = async (req: Request, res: Response): Promise<void> => {
+export const createRecurringEvent = async (req, res) => {
   try {
     const count = await RecurringEventModel.countDocuments();
     const newId = `REC-${String(count + 1).padStart(3, '0')}`;
@@ -30,7 +29,7 @@ export const createRecurringEvent = async (req: Request, res: Response): Promise
   }
 };
 
-export const generateEvents = async (req: Request, res: Response): Promise<void> => {
+export const generateEvents = async (req, res) => {
   try {
     const seriesId = req.params.id;
     const countToGenerate = Number(req.body.count || 4);

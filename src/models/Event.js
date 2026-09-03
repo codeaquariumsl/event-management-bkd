@@ -1,78 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
-
-export interface IServiceItem {
-  id: string;
-  name: string;
-  category: 'DJ' | 'Sound' | 'Lighting' | 'LED' | 'Production' | 'Staff' | 'Other';
-  description?: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-}
-
-export interface IStaffAssignment {
-  id: string;
-  staffId: string;
-  staffName: string;
-  role: string;
-  assignedDate: string;
-  startTime: string;
-  endTime: string;
-  paymentAmount: number;
-  paidAmount: number;
-  status: 'Assigned' | 'Confirmed' | 'Completed' | 'Cancelled';
-  notes?: string;
-}
-
-export interface IEventExpense {
-  id: string;
-  title: string;
-  category: 'Transport' | 'Equipment Rental' | 'Catering' | 'Venue Fee' | 'Miscellaneous';
-  amount: number;
-  date: string;
-  notes?: string;
-}
-
-export interface IEventTimelineItem {
-  id: string;
-  title: string;
-  description: string;
-  timestamp: string;
-  completed: boolean;
-  type?: 'created' | 'confirmed' | 'payment' | 'staff' | 'logistics' | 'completed';
-}
-
-export interface IEvent extends Document {
-  id: string;
-  name: string;
-  customerId: string;
-  customerName: string;
-  customerCompany?: string;
-  customerPhone?: string;
-  customerEmail?: string;
-  eventType: string;
-  eventDate: string;
-  startTime: string;
-  endTime: string;
-  location: string;
-  address?: string;
-  description?: string;
-  notes?: string;
-  status: 'Draft' | 'Pending' | 'Confirmed' | 'In Progress' | 'Completed' | 'Cancelled';
-  services: IServiceItem[];
-  assignedStaff: IStaffAssignment[];
-  expenses: IEventExpense[];
-  timeline: IEventTimelineItem[];
-  subtotal: number;
-  discount: number;
-  additionalCharges: number;
-  totalAmount: number;
-  paidAmount: number;
-  balance: number;
-  recurringSeriesId?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import mongoose, { Schema } from 'mongoose';
 
 const ServiceItemSchema = new Schema(
   {
@@ -167,7 +93,7 @@ const EventSchema = new Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (_, ret: any) => {
+      transform: (_, ret) => {
         delete ret._id;
         delete ret.__v;
         return ret;
@@ -176,4 +102,4 @@ const EventSchema = new Schema(
   }
 );
 
-export const EventModel = mongoose.model<IEvent>('Event', EventSchema);
+export const EventModel = mongoose.model('Event', EventSchema);

@@ -1,28 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export type UserRole =
-  | 'Super Admin'
-  | 'Event Director'
-  | 'Production Manager'
-  | 'Finance Officer'
-  | 'Crew Coordinator'
-  | 'Read Only';
-
-export interface IUser extends Document {
-  id: string;
-  name: string;
-  email: string;
-  password?: string;
-  avatar?: string;
-  phone?: string;
-  role: UserRole;
-  status: 'Active' | 'Inactive' | 'Suspended';
-  permissions: string[];
-  lastLogin?: string;
-  createdAt: string;
-}
-
-const UserSchema: Schema = new Schema(
+const UserSchema = new Schema(
   {
     id: { type: String, required: true, unique: true },
     name: { type: String, required: true },
@@ -54,7 +32,7 @@ const UserSchema: Schema = new Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (_, ret: any) => {
+      transform: (_, ret) => {
         delete ret._id;
         delete ret.__v;
         delete ret.password;
@@ -64,4 +42,4 @@ const UserSchema: Schema = new Schema(
   }
 );
 
-export const UserModel = mongoose.model<IUser>('User', UserSchema);
+export const UserModel = mongoose.model('User', UserSchema);

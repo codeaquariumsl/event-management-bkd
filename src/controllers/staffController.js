@@ -1,9 +1,8 @@
-import { Request, Response } from 'express';
 import { StaffModel } from '../models/Staff.js';
 import { EventModel } from '../models/Event.js';
 import { StaffPaymentModel } from '../models/Payment.js';
 
-export const getStaff = async (req: Request, res: Response): Promise<void> => {
+export const getStaff = async (req, res) => {
   try {
     const staff = await StaffModel.find().sort({ name: 1 });
     res.json(staff);
@@ -12,7 +11,7 @@ export const getStaff = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getStaffById = async (req: Request, res: Response): Promise<void> => {
+export const getStaffById = async (req, res) => {
   try {
     const staffMember = await StaffModel.findOne({ id: req.params.id });
     if (!staffMember) {
@@ -25,12 +24,12 @@ export const getStaffById = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-export const createStaff = async (req: Request, res: Response): Promise<void> => {
+export const createStaff = async (req, res) => {
   try {
     const count = await StaffModel.countDocuments();
     const newId = `STF-${String(count + 1).padStart(3, '0')}`;
     const initials = req.body.name
-      ? req.body.name.split(' ').map((p: string) => p[0]).join('').slice(0, 2).toUpperCase()
+      ? req.body.name.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase()
       : 'ST';
 
     const staff = new StaffModel({
@@ -46,7 +45,7 @@ export const createStaff = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-export const updateStaff = async (req: Request, res: Response): Promise<void> => {
+export const updateStaff = async (req, res) => {
   try {
     const updated = await StaffModel.findOneAndUpdate(
       { id: req.params.id },
@@ -63,7 +62,7 @@ export const updateStaff = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-export const deleteStaff = async (req: Request, res: Response): Promise<void> => {
+export const deleteStaff = async (req, res) => {
   try {
     const deleted = await StaffModel.findOneAndDelete({ id: req.params.id });
     if (!deleted) {
@@ -76,9 +75,9 @@ export const deleteStaff = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-export const getPayrollSummary = async (req: Request, res: Response): Promise<void> => {
+export const getPayrollSummary = async (req, res) => {
   try {
-    const monthYear = (req.query.month as string) || new Date().toISOString().slice(0, 7);
+    const monthYear = req.query.month || new Date().toISOString().slice(0, 7);
     const staffList = await StaffModel.find();
     const events = await EventModel.find({ eventDate: { $regex: `^${monthYear}` } });
     const payments = await StaffPaymentModel.find({
@@ -89,7 +88,6 @@ export const getPayrollSummary = async (req: Request, res: Response): Promise<vo
     const payroll = staffList.map((member) => {
       const basic = member.employmentType === 'Full Time' ? member.basicSalary : 0;
 
-      // Event payouts for this staff member this month
       const memberEvents = events.filter((e) =>
         e.assignedStaff.some((as) => as.staffId === member.id)
       );
@@ -99,7 +97,6 @@ export const getPayrollSummary = async (req: Request, res: Response): Promise<vo
         return acc + (as?.paymentAmount || 0);
       }, 0);
 
-      // Paid to date
       const paid = payments
         .filter((p) => p.staffId === member.id)
         .reduce((sum, p) => sum + p.paidAmount, 0);

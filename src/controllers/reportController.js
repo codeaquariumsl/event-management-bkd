@@ -1,10 +1,9 @@
-import { Request, Response } from 'express';
 import { EventModel } from '../models/Event.js';
 import { StaffModel } from '../models/Staff.js';
 import { CustomerModel } from '../models/Customer.js';
 import { CustomerPaymentModel, StaffPaymentModel } from '../models/Payment.js';
 
-export const getDashboardMetrics = async (req: Request, res: Response): Promise<void> => {
+export const getDashboardMetrics = async (req, res) => {
   try {
     const events = await EventModel.find();
     const staff = await StaffModel.find();

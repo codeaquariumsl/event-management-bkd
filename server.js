@@ -1,17 +1,17 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { connectDB } from './config/db.js';
+import { connectDB } from './src/config/db.js';
 
-import customerRoutes from './routes/customerRoutes.js';
-import staffRoutes from './routes/staffRoutes.js';
-import eventRoutes from './routes/eventRoutes.js';
-import recurringRoutes from './routes/recurringRoutes.js';
-import paymentRoutes from './routes/paymentRoutes.js';
-import reportRoutes from './routes/reportRoutes.js';
-import settingsRoutes from './routes/settingsRoutes.js';
-import userRoutes from './routes/userRoutes.js';
-import authRoutes from './routes/authRoutes.js';
+import customerRoutes from './src/routes/customerRoutes.js';
+import staffRoutes from './src/routes/staffRoutes.js';
+import eventRoutes from './src/routes/eventRoutes.js';
+import recurringRoutes from './src/routes/recurringRoutes.js';
+import paymentRoutes from './src/routes/paymentRoutes.js';
+import reportRoutes from './src/routes/reportRoutes.js';
+import settingsRoutes from './src/routes/settingsRoutes.js';
+import userRoutes from './src/routes/userRoutes.js';
+import authRoutes from './src/routes/authRoutes.js';
 
 dotenv.config();
 
@@ -19,17 +19,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(
-  cors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(express.json());
 
 // API Health Check
 // Seekers Production Backend v1.0.0
-app.get('/api/health', (req: Request, res: Response) => {
+app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     service: 'Seekers Entertainment Backend API',
@@ -49,7 +44,7 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/users', userRoutes);
 
 // Global Error Handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+app.use((err, req, res, next) => {
   console.error('Unhandled Server Error:', err);
   res.status(500).json({
     message: err.message || 'Internal Server Error',

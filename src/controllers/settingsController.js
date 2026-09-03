@@ -1,7 +1,6 @@
-import { Request, Response } from 'express';
 import { CompanyProfileModel, ServiceCatalogModel } from '../models/CompanyProfile.js';
 
-export const getCompanyProfile = async (req: Request, res: Response): Promise<void> => {
+export const getCompanyProfile = async (req, res) => {
   try {
     let profile = await CompanyProfileModel.findOne();
     if (!profile) {
@@ -27,7 +26,7 @@ export const getCompanyProfile = async (req: Request, res: Response): Promise<vo
   }
 };
 
-export const updateCompanyProfile = async (req: Request, res: Response): Promise<void> => {
+export const updateCompanyProfile = async (req, res) => {
   try {
     let profile = await CompanyProfileModel.findOne();
     if (!profile) {
@@ -42,7 +41,7 @@ export const updateCompanyProfile = async (req: Request, res: Response): Promise
   }
 };
 
-export const getServices = async (req: Request, res: Response): Promise<void> => {
+export const getServices = async (req, res) => {
   try {
     const services = await ServiceCatalogModel.find().sort({ unitPrice: -1 });
     res.json(services);
@@ -51,7 +50,7 @@ export const getServices = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-export const createService = async (req: Request, res: Response): Promise<void> => {
+export const createService = async (req, res) => {
   try {
     const count = await ServiceCatalogModel.countDocuments();
     const newId = req.body.id || `srv-${count + 1}`;

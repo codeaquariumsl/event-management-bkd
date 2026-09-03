@@ -1,22 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface ICustomer extends Document {
-  id: string;
-  name: string;
-  company?: string;
-  phone: string;
-  email?: string;
-  address?: string;
-  customerType: 'Individual' | 'Company' | 'Hotel' | 'Club' | 'Restaurant' | 'Corporate' | 'Other';
-  status: 'Active' | 'Inactive' | 'Lead';
-  notes?: string;
-  totalEvents: number;
-  totalRevenue: number;
-  outstandingBalance: number;
-  createdAt: string;
-}
-
-const CustomerSchema: Schema = new Schema(
+const CustomerSchema = new Schema(
   {
     id: { type: String, required: true, unique: true },
     name: { type: String, required: true },
@@ -43,7 +27,7 @@ const CustomerSchema: Schema = new Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (_, ret: any) => {
+      transform: (_, ret) => {
         delete ret._id;
         delete ret.__v;
         return ret;
@@ -52,4 +36,4 @@ const CustomerSchema: Schema = new Schema(
   }
 );
 
-export const CustomerModel = mongoose.model<ICustomer>('Customer', CustomerSchema);
+export const CustomerModel = mongoose.model('Customer', CustomerSchema);

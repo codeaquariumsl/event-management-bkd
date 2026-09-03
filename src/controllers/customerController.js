@@ -1,8 +1,6 @@
-import { Request, Response } from 'express';
 import { CustomerModel } from '../models/Customer.js';
-import { EventModel } from '../models/Event.js';
 
-export const getCustomers = async (req: Request, res: Response): Promise<void> => {
+export const getCustomers = async (req, res) => {
   try {
     const customers = await CustomerModel.find().sort({ createdAt: -1 });
     res.json(customers);
@@ -11,7 +9,7 @@ export const getCustomers = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-export const getCustomerById = async (req: Request, res: Response): Promise<void> => {
+export const getCustomerById = async (req, res) => {
   try {
     const customer = await CustomerModel.findOne({ id: req.params.id });
     if (!customer) {
@@ -24,7 +22,7 @@ export const getCustomerById = async (req: Request, res: Response): Promise<void
   }
 };
 
-export const createCustomer = async (req: Request, res: Response): Promise<void> => {
+export const createCustomer = async (req, res) => {
   try {
     const count = await CustomerModel.countDocuments();
     const newId = `CUST-${String(count + 1).padStart(3, '0')}`;
@@ -44,7 +42,7 @@ export const createCustomer = async (req: Request, res: Response): Promise<void>
   }
 };
 
-export const updateCustomer = async (req: Request, res: Response): Promise<void> => {
+export const updateCustomer = async (req, res) => {
   try {
     const updated = await CustomerModel.findOneAndUpdate(
       { id: req.params.id },
@@ -61,7 +59,7 @@ export const updateCustomer = async (req: Request, res: Response): Promise<void>
   }
 };
 
-export const deleteCustomer = async (req: Request, res: Response): Promise<void> => {
+export const deleteCustomer = async (req, res) => {
   try {
     const deleted = await CustomerModel.findOneAndDelete({ id: req.params.id });
     if (!deleted) {

@@ -1,9 +1,8 @@
-import { Request, Response } from 'express';
 import { CustomerPaymentModel, StaffPaymentModel } from '../models/Payment.js';
 import { EventModel } from '../models/Event.js';
 import { CustomerModel } from '../models/Customer.js';
 
-export const getCustomerPayments = async (req: Request, res: Response): Promise<void> => {
+export const getCustomerPayments = async (req, res) => {
   try {
     const payments = await CustomerPaymentModel.find().sort({ date: -1 });
     res.json(payments);
@@ -12,7 +11,7 @@ export const getCustomerPayments = async (req: Request, res: Response): Promise<
   }
 };
 
-export const recordCustomerPayment = async (req: Request, res: Response): Promise<void> => {
+export const recordCustomerPayment = async (req, res) => {
   try {
     const count = await CustomerPaymentModel.countDocuments();
     const newId = `PAY-CUST-${String(count + 101)}`;
@@ -57,7 +56,7 @@ export const recordCustomerPayment = async (req: Request, res: Response): Promis
   }
 };
 
-export const getStaffPayments = async (req: Request, res: Response): Promise<void> => {
+export const getStaffPayments = async (req, res) => {
   try {
     const payments = await StaffPaymentModel.find().sort({ date: -1 });
     res.json(payments);
@@ -66,7 +65,7 @@ export const getStaffPayments = async (req: Request, res: Response): Promise<voi
   }
 };
 
-export const recordStaffPayment = async (req: Request, res: Response): Promise<void> => {
+export const recordStaffPayment = async (req, res) => {
   try {
     const count = await StaffPaymentModel.countDocuments();
     const newId = `PAY-STF-${String(count + 1).padStart(3, '0')}`;

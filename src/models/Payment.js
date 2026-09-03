@@ -1,22 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
-
-export interface ICustomerPayment extends Document {
-  id: string;
-  invoiceNumber: string;
-  eventId: string;
-  eventName: string;
-  customerId: string;
-  customerName: string;
-  date: string;
-  amount: number;
-  paymentMethod: string;
-  referenceNumber?: string;
-  notes?: string;
-  status: string;
-  eventTotal: number;
-  eventPaid: number;
-  eventBalance: number;
-}
+import mongoose, { Schema } from 'mongoose';
 
 const CustomerPaymentSchema = new Schema(
   {
@@ -39,7 +21,7 @@ const CustomerPaymentSchema = new Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (_, ret: any) => {
+      transform: (_, ret) => {
         delete ret._id;
         delete ret.__v;
         return ret;
@@ -48,25 +30,7 @@ const CustomerPaymentSchema = new Schema(
   }
 );
 
-export const CustomerPaymentModel = mongoose.model<ICustomerPayment>('CustomerPayment', CustomerPaymentSchema);
-
-export interface IStaffPayment extends Document {
-  id: string;
-  staffId: string;
-  staffName: string;
-  eventId?: string;
-  eventName?: string;
-  paymentType: string;
-  date: string;
-  amount: number;
-  paidAmount: number;
-  balance: number;
-  status: string;
-  paymentMethod: string;
-  referenceNumber?: string;
-  notes?: string;
-  monthYear?: string;
-}
+export const CustomerPaymentModel = mongoose.model('CustomerPayment', CustomerPaymentSchema);
 
 const StaffPaymentSchema = new Schema(
   {
@@ -93,7 +57,7 @@ const StaffPaymentSchema = new Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (_, ret: any) => {
+      transform: (_, ret) => {
         delete ret._id;
         delete ret.__v;
         return ret;
@@ -102,4 +66,4 @@ const StaffPaymentSchema = new Schema(
   }
 );
 
-export const StaffPaymentModel = mongoose.model<IStaffPayment>('StaffPayment', StaffPaymentSchema);
+export const StaffPaymentModel = mongoose.model('StaffPayment', StaffPaymentSchema);

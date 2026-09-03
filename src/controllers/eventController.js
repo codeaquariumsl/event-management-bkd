@@ -1,15 +1,14 @@
-import { Request, Response } from 'express';
 import { EventModel } from '../models/Event.js';
 import { CustomerModel } from '../models/Customer.js';
 import { StaffModel } from '../models/Staff.js';
 
-const timeToMinutes = (timeStr: string): number => {
+const timeToMinutes = (timeStr) => {
   if (!timeStr) return 0;
   const [h, m] = timeStr.split(':').map(Number);
   return (h || 0) * 60 + (m || 0);
 };
 
-const updateCustomerStats = async (customerId: string) => {
+const updateCustomerStats = async (customerId) => {
   try {
     const events = await EventModel.find({ customerId, status: { $ne: 'Cancelled' } });
     const totalEvents = events.length;
@@ -25,9 +24,9 @@ const updateCustomerStats = async (customerId: string) => {
   }
 };
 
-export const getEvents = async (req: Request, res: Response): Promise<void> => {
+export const getEvents = async (req, res) => {
   try {
-    const filter: any = {};
+    const filter = {};
     if (req.query.status && req.query.status !== 'ALL') {
       filter.status = req.query.status;
     }
@@ -45,7 +44,7 @@ export const getEvents = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getEventById = async (req: Request, res: Response): Promise<void> => {
+export const getEventById = async (req, res) => {
   try {
     const event = await EventModel.findOne({ id: req.params.id });
     if (!event) {
@@ -58,13 +57,13 @@ export const getEventById = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-export const createEvent = async (req: Request, res: Response): Promise<void> => {
+export const createEvent = async (req, res) => {
   try {
     const count = await EventModel.countDocuments();
     const newId = req.body.id || `EVT-2026-${String(count + 1).padStart(3, '0')}`;
 
     const subtotal = req.body.services
-      ? req.body.services.reduce((sum: number, s: any) => sum + (s.totalPrice || 0), 0)
+      ? req.body.services.reduce((sum, s) => sum + (s.totalPrice || 0), 0)
       : req.body.subtotal || 0;
 
     const discount = Number(req.body.discount || 0);
@@ -105,7 +104,7 @@ export const createEvent = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-export const updateEvent = async (req: Request, res: Response): Promise<void> => {
+export const updateEvent = async (req, res) => {
   try {
     const existing = await EventModel.findOne({ id: req.params.id });
     if (!existing) {
@@ -114,7 +113,7 @@ export const updateEvent = async (req: Request, res: Response): Promise<void> =>
     }
 
     const subtotal = req.body.services
-      ? req.body.services.reduce((sum: number, s: any) => sum + (s.totalPrice || 0), 0)
+      ? req.body.services.reduce((sum, s) => sum + (s.totalPrice || 0), 0)
       : req.body.subtotal ?? existing.subtotal;
 
     const discount = req.body.discount !== undefined ? Number(req.body.discount) : existing.discount;
@@ -148,7 +147,7 @@ export const updateEvent = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-export const deleteEvent = async (req: Request, res: Response): Promise<void> => {
+export const deleteEvent = async (req, res) => {
   try {
     const deleted = await EventModel.findOneAndDelete({ id: req.params.id });
     if (!deleted) {
@@ -162,15 +161,9 @@ export const deleteEvent = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-export const checkStaffConflict = async (req: Request, res: Response): Promise<void> => {
+export const checkStaffConflict = async (req, res) => {
   try {
-    const { staffId, date, startTime, endTime, excludeEventId } = req.query as {
-      staffId: string;
-      date: string;
-      startTime: string;
-      endTime: string;
-      excludeEventId?: string;
-    };
+    const { staffId, date, startTime, endTime, excludeEventId } = req.query;
 
     if (!staffId || !date || !startTime || !endTime) {
       res.status(400).json({ message: 'staffId, date, startTime, and endTime are required' });
@@ -180,7 +173,7 @@ export const checkStaffConflict = async (req: Request, res: Response): Promise<v
     const startMinutes = timeToMinutes(startTime);
     const endMinutes = timeToMinutes(endTime);
 
-    const filter: any = {
+    const filter = {
       eventDate: date,
       status: { $ne: 'Cancelled' },
       'assignedStaff.staffId': staffId,
