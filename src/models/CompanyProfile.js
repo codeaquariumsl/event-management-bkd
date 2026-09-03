@@ -37,6 +37,10 @@ const ServiceCatalogSchema = new Schema(
     category: { type: String, default: 'Production' },
     description: { type: String, default: '' },
     unitPrice: { type: Number, default: 0 },
+    duration: { type: String, default: 'Per Event' },
+    features: [{ type: String }],
+    isActive: { type: Boolean, default: true },
+    sortOrder: { type: Number, default: 0 },
   },
   {
     timestamps: true,

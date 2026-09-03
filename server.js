@@ -82,6 +82,7 @@ app.use('/api/recurring-events', recurringRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/services', settingsRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/event-types', eventTypeRoutes);
 app.use('/api/inventory', inventoryRoutes);
