@@ -29,6 +29,21 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Request Logging Middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  const time = new Date().toLocaleTimeString();
+
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    const status = res.statusCode;
+    const statusEmoji = status >= 500 ? '❌' : status >= 400 ? '⚠️' : '✅';
+    console.log(`${statusEmoji} [${time}] ${req.method} ${req.originalUrl} -> ${status} (${duration}ms)`);
+  });
+
+  next();
+});
+
 // API Health Check
 // Seekers Production Backend v1.0.0
 app.get('/api/health', (req, res) => {
