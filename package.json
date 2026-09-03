@@ -1,0 +1,28 @@
+{
+  "name": "seekers-event-management-bkd",
+  "version": "1.0.0",
+  "description": "Backend REST API for Seekers Entertainment Management System using Node.js, Express, and MongoDB",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "seed": "tsx src/seed/seed.ts"
+  },
+  "keywords": ["event-management", "seekers-entertainment", "nodejs", "mongodb", "express"],
+  "author": "Seekers Entertainment",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.10.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.4",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}
