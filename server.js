@@ -1,21 +1,8 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 
-// Determine backend directory path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Explicitly load .env file from event-management-bkd directory
-dotenv.config({ path: path.resolve(__dirname, '.env') });
-if (!process.env.MONGODB_URI) {
-  dotenv.config({ path: path.resolve(process.cwd(), 'event-management-bkd', '.env') });
-}
-if (!process.env.MONGODB_URI) {
-  dotenv.config({ path: path.resolve(process.cwd(), '.env') });
-}
 
 import { connectDB } from './src/config/db.js';
 import customerRoutes from './src/routes/customerRoutes.js';

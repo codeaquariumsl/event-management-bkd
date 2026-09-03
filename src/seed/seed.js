@@ -1,7 +1,6 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 import { CustomerModel } from '../models/Customer.js';
 import { StaffModel } from '../models/Staff.js';
 import { EventModel } from '../models/Event.js';
@@ -10,18 +9,6 @@ import { CustomerPaymentModel, StaffPaymentModel } from '../models/Payment.js';
 import { CompanyProfileModel, ServiceCatalogModel } from '../models/CompanyProfile.js';
 import { UserModel } from '../models/User.js';
 
-// Determine directory path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Explicitly load .env from event-management-bkd directory
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
-if (!process.env.MONGODB_URI) {
-  dotenv.config({ path: path.resolve(process.cwd(), 'event-management-bkd', '.env') });
-}
-if (!process.env.MONGODB_URI) {
-  dotenv.config({ path: path.resolve(process.cwd(), '.env') });
-}
 
 async function seed() {
   const uri = process.env.MONGODB_URI;
