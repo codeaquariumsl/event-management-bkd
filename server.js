@@ -47,14 +47,30 @@ app.use((req, res, next) => {
   next();
 });
 
+import mongoose from 'mongoose';
+
 // API Health Check
 // Seekers Production Backend v1.0.0
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     service: 'Seekers Entertainment Backend API',
     timestamp: new Date().toISOString(),
   });
+});
+
+// Database connection readiness check
+// Fails instantly with 503 instead of hanging for 10s if MongoDB Atlas is disconnected
+app.use('/api', (req, res, next) => {
+  if (req.path === '/health') return next();
+  if (mongoose.connection.readyState !== 1) {
+    return res.status(503).json({
+      message: 'MongoDB Atlas is disconnected. Please ensure your IP is whitelisted in MongoDB Atlas Network Access: https://cloud.mongodb.com',
+      status: 'database_unavailable',
+    });
+  }
+  next();
 });
 
 // Mount Routes
@@ -81,10 +97,12 @@ app.use((err, req, res, next) => {
 });
 
 // Start Server & Connect Database
-const startServer = async () => {
-  await connectDB();
+const startServer = () => {
   app.listen(PORT, () => {
     console.log(`🚀 Seekers Entertainment API listening on http://localhost:${PORT}`);
+  });
+  connectDB().catch((err) => {
+    console.error('❌ Database connection error:', err);
   });
 };
 

@@ -10,7 +10,6 @@ const CustomerSchema = new Schema(
     address: { type: String, default: '' },
     customerType: {
       type: String,
-      enum: ['Individual', 'Company', 'Hotel', 'Club', 'Restaurant', 'Corporate', 'Other'],
       default: 'Individual',
     },
     status: {
