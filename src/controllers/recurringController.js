@@ -13,8 +13,18 @@ export const getRecurringEvents = async (req, res) => {
 
 export const createRecurringEvent = async (req, res) => {
   try {
-    const count = await RecurringEventModel.countDocuments();
-    const newId = `REC-${String(count + 1).padStart(3, '0')}`;
+    let newId = req.body.id;
+    if (!newId) {
+      const allRec = await RecurringEventModel.find({}, 'id');
+      let maxNum = 0;
+      allRec.forEach((r) => {
+        if (r.id && r.id.startsWith('REC-')) {
+          const num = parseInt(r.id.replace('REC-', ''), 10);
+          if (!isNaN(num) && num > maxNum) maxNum = num;
+        }
+      });
+      newId = `REC-${String(maxNum + 1).padStart(3, '0')}`;
+    }
 
     const recurring = new RecurringEventModel({
       ...req.body,
@@ -26,6 +36,34 @@ export const createRecurringEvent = async (req, res) => {
     res.status(201).json(saved);
   } catch (error) {
     res.status(500).json({ message: 'Error creating recurring series', error });
+  }
+};
+
+export const updateRecurringEvent = async (req, res) => {
+  try {
+    const updated = await RecurringEventModel.findOneAndUpdate(
+      { id: req.params.id },
+      { $set: req.body },
+      { new: true }
+    );
+    if (!updated) {
+      return res.status(404).json({ message: 'Recurring event series not found' });
+    }
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating recurring series', error });
+  }
+};
+
+export const deleteRecurringEvent = async (req, res) => {
+  try {
+    const deleted = await RecurringEventModel.findOneAndDelete({ id: req.params.id });
+    if (!deleted) {
+      return res.status(404).json({ message: 'Recurring event series not found' });
+    }
+    res.json({ success: true, message: 'Recurring event series deleted' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting recurring series', error });
   }
 };
 
