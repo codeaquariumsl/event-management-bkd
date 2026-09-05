@@ -31,8 +31,27 @@ export const createQuotation = async (req, res) => {
   try {
     const count = await QuotationModel.countDocuments();
     const id = req.body.id || `quot-${Date.now()}-${count + 1}`;
-    const year = new Date().getFullYear();
-    const quotationNumber = req.body.quotationNumber || `QT-${year}-${String(count + 1).padStart(3, '0')}`;
+    const now = new Date();
+    const yy = String(now.getFullYear()).slice(-2);
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const prefix = `${yy}${mm}-`;
+
+    let quotationNumber = req.body.quotationNumber;
+    if (!quotationNumber) {
+      const monthQuotes = await QuotationModel.find({
+        quotationNumber: new RegExp(`^${prefix}`),
+      }).select('quotationNumber');
+
+      let nextSeq = 1;
+      if (monthQuotes && monthQuotes.length > 0) {
+        const maxSeq = monthQuotes.reduce((max, q) => {
+          const num = parseInt(q.quotationNumber.slice(prefix.length), 10);
+          return !isNaN(num) && num > max ? num : max;
+        }, 0);
+        nextSeq = maxSeq + 1;
+      }
+      quotationNumber = `${prefix}${String(nextSeq).padStart(4, '0')}`;
+    }
 
     const quotation = new QuotationModel({
       ...req.body,
