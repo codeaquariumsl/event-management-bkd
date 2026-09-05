@@ -9,7 +9,7 @@ const StaffSchema = new Schema(
     email: { type: String, default: '' },
     role: {
       type: String,
-      enum: ['DJ', 'VJ', 'Sound Engineer', 'Lighting Technician', 'LED Technician', 'Event Manager', 'Driver', 'Assistant', 'Other'],
+      enum: ['DJ', 'VJ', 'Sound Engineer', 'Lighting Technician', 'LED Technician', 'Event Crew', 'Event Manager', 'Driver', 'Assistant', 'Other'],
       default: 'DJ',
     },
     skills: [{ type: String }],

@@ -57,10 +57,43 @@ export const getEventById = async (req, res) => {
   }
 };
 
+// Helper to safely generate the next unique Event ID (EVT-YYYY-XXX)
+export const generateNextEventId = async () => {
+  const currentYear = new Date().getFullYear();
+  const prefix = `EVT-${currentYear}-`;
+
+  const events = await EventModel.find({}, { id: 1 }).lean();
+
+  let maxSeq = 0;
+  for (const ev of events) {
+    if (typeof ev?.id === 'string') {
+      const match = ev.id.match(/^EVT-(?:\d{4}-)?(\d+)$/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (!isNaN(num) && num > maxSeq) {
+          maxSeq = num;
+        }
+      }
+    }
+  }
+
+  let nextSeq = maxSeq + 1;
+  let candidateId = `${prefix}${String(nextSeq).padStart(3, '0')}`;
+
+  while (await EventModel.exists({ id: candidateId })) {
+    nextSeq++;
+    candidateId = `${prefix}${String(nextSeq).padStart(3, '0')}`;
+  }
+
+  return candidateId;
+};
+
 export const createEvent = async (req, res) => {
   try {
-    const count = await EventModel.countDocuments();
-    const newId = req.body.id || `EVT-2026-${String(count + 1).padStart(3, '0')}`;
+    let newId = req.body.id;
+    if (!newId || (await EventModel.exists({ id: newId }))) {
+      newId = await generateNextEventId();
+    }
 
     const subtotal = req.body.services
       ? req.body.services.reduce((sum, s) => sum + (s.totalPrice || 0), 0)
@@ -95,7 +128,18 @@ export const createEvent = async (req, res) => {
       updatedAt: now,
     });
 
-    const saved = await event.save();
+    let saved;
+    try {
+      saved = await event.save();
+    } catch (saveErr) {
+      if (saveErr.code === 11000) {
+        event.id = await generateNextEventId();
+        saved = await event.save();
+      } else {
+        throw saveErr;
+      }
+    }
+
     await updateCustomerStats(saved.customerId);
 
     res.status(201).json(saved);

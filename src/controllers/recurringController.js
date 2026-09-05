@@ -1,6 +1,7 @@
 import { RecurringEventModel } from '../models/RecurringEvent.js';
 import { EventModel } from '../models/Event.js';
 import { StaffModel } from '../models/Staff.js';
+import { generateNextEventId } from './eventController.js';
 
 export const getRecurringEvents = async (req, res) => {
   try {
@@ -112,7 +113,7 @@ export const generateEvents = async (req, res) => {
       const targetDate = new Date(baseDate);
       targetDate.setDate(targetDate.getDate() + i * dayInterval);
       const dateStr = targetDate.toISOString().split('T')[0];
-      const newEvtId = `EVT-2026-${String(eventCount + i).padStart(3, '0')}`;
+      const newEvtId = await generateNextEventId();
 
       const newEvt = new EventModel({
         id: newEvtId,

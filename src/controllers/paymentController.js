@@ -14,7 +14,12 @@ export const getCustomerPayments = async (req, res) => {
 export const recordCustomerPayment = async (req, res) => {
   try {
     const count = await CustomerPaymentModel.countDocuments();
-    const newId = `PAY-CUST-${String(count + 101)}`;
+    let seq = count + 101;
+    let newId = `PAY-CUST-${String(seq)}`;
+    while (await CustomerPaymentModel.exists({ id: newId })) {
+      seq++;
+      newId = `PAY-CUST-${String(seq)}`;
+    }
 
     const payment = new CustomerPaymentModel({
       ...req.body,
@@ -68,7 +73,12 @@ export const getStaffPayments = async (req, res) => {
 export const recordStaffPayment = async (req, res) => {
   try {
     const count = await StaffPaymentModel.countDocuments();
-    const newId = `PAY-STF-${String(count + 1).padStart(3, '0')}`;
+    let seq = count + 1;
+    let newId = `PAY-STF-${String(seq).padStart(3, '0')}`;
+    while (await StaffPaymentModel.exists({ id: newId })) {
+      seq++;
+      newId = `PAY-STF-${String(seq).padStart(3, '0')}`;
+    }
 
     const payment = new StaffPaymentModel({
       ...req.body,

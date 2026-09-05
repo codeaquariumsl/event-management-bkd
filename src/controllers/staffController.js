@@ -27,7 +27,12 @@ export const getStaffById = async (req, res) => {
 export const createStaff = async (req, res) => {
   try {
     const count = await StaffModel.countDocuments();
-    const newId = `STF-${String(count + 1).padStart(3, '0')}`;
+    let seq = count + 1;
+    let newId = `STF-${String(seq).padStart(3, '0')}`;
+    while (await StaffModel.exists({ id: newId })) {
+      seq++;
+      newId = `STF-${String(seq).padStart(3, '0')}`;
+    }
     const initials = req.body.name
       ? req.body.name.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase()
       : 'ST';

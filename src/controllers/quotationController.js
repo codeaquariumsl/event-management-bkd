@@ -1,5 +1,6 @@
 import { QuotationModel } from '../models/Quotation.js';
 import { EventModel } from '../models/Event.js';
+import { generateNextEventId } from './eventController.js';
 
 export const getQuotations = async (req, res) => {
   try {
@@ -111,8 +112,7 @@ export const convertToEvent = async (req, res) => {
       totalPrice: item.totalPrice || (item.quantity * item.unitPrice),
     }));
 
-    const eventCount = await EventModel.countDocuments();
-    const eventId = `EVT-${Date.now()}-${eventCount + 1}`;
+    const eventId = await generateNextEventId();
 
     const newEvent = new EventModel({
       id: eventId,
