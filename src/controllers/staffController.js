@@ -2,10 +2,88 @@ import { StaffModel } from '../models/Staff.js';
 import { EventModel } from '../models/Event.js';
 import { StaffPaymentModel } from '../models/Payment.js';
 
+const enrichStaffWithMetrics = async (staffList) => {
+  try {
+    const events = await EventModel.find(
+      { status: { $ne: 'Cancelled' } },
+      { assignedStaff: 1, status: 1 }
+    ).lean();
+
+    const payments = await StaffPaymentModel.find(
+      {},
+      { staffId: 1, amount: 1, paidAmount: 1, status: 1 }
+    ).lean();
+
+    return staffList.map((doc) => {
+      const member = doc.toObject ? doc.toObject() : { ...doc };
+      delete member._id;
+      delete member.__v;
+
+      const memberEvents = events.filter((e) =>
+        Array.isArray(e.assignedStaff) && e.assignedStaff.some((as) => as.staffId === member.id)
+      );
+
+      const totalEventsAssigned = memberEvents.length;
+      const totalEventsCompleted = memberEvents.filter((e) => e.status === 'Completed').length;
+
+      const eventEarnings = memberEvents.reduce((acc, evt) => {
+        const as = evt.assignedStaff.find((a) => a.staffId === member.id);
+        return acc + (Number(as?.paymentAmount) || 0);
+      }, 0);
+
+      const eventDirectPaid = memberEvents.reduce((acc, evt) => {
+        const as = evt.assignedStaff.find((a) => a.staffId === member.id);
+        return acc + (Number(as?.paidAmount) || 0);
+      }, 0);
+
+      const paymentDisbursements = payments
+        .filter((p) => p.staffId === member.id)
+        .reduce((sum, p) => sum + (Number(p.paidAmount) || Number(p.amount) || 0), 0);
+
+      const totalPaid = Math.max(paymentDisbursements, eventDirectPaid);
+      const totalEarnings = eventEarnings;
+      const pendingPayments = Math.max(0, totalEarnings - totalPaid);
+
+      return {
+        ...member,
+        totalEventsAssigned,
+        totalEventsCompleted,
+        totalEarnings,
+        pendingPayments,
+      };
+    });
+  } catch (err) {
+    console.error('Error enriching staff metrics:', err);
+    return staffList.map((doc) => {
+      const member = doc.toObject ? doc.toObject() : { ...doc };
+      delete member._id;
+      delete member.__v;
+      return member;
+    });
+  }
+};
+
 export const getStaff = async (req, res) => {
   try {
     const staff = await StaffModel.find().sort({ name: 1 });
-    res.json(staff);
+    const enriched = await enrichStaffWithMetrics(staff);
+
+    // Sync metrics to Staff documents in background
+    enriched.forEach((m) => {
+      StaffModel.updateOne(
+        { id: m.id },
+        {
+          $set: {
+            totalEventsAssigned: m.totalEventsAssigned,
+            totalEventsCompleted: m.totalEventsCompleted,
+            totalEarnings: m.totalEarnings,
+            pendingPayments: m.pendingPayments,
+          },
+        }
+      ).catch(() => {});
+    });
+
+    res.json(enriched);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching staff', error });
   }
@@ -18,7 +96,8 @@ export const getStaffById = async (req, res) => {
       res.status(404).json({ message: 'Staff member not found' });
       return;
     }
-    res.json(staffMember);
+    const [enriched] = await enrichStaffWithMetrics([staffMember]);
+    res.json(enriched);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching staff member', error });
   }
