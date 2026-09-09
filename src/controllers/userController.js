@@ -149,6 +149,26 @@ export const deleteUser = async (req, res) => {
   }
 };
 
+export const changePassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (!password || password.length < 6) {
+      res.status(400).json({ message: 'Password must be at least 6 characters long' });
+      return;
+    }
+    const user = await UserModel.findOne({ id: req.params.id });
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+    user.password = password;
+    await user.save();
+    res.json({ success: true, message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating password', error });
+  }
+};
+
 export const getRolesMatrix = async (_req, res) => {
   res.json(ROLE_DEFAULT_PERMISSIONS);
 };

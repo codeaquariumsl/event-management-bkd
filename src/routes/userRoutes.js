@@ -5,6 +5,7 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  changePassword,
   getRolesMatrix,
 } from '../controllers/userController.js';
 
@@ -15,6 +16,8 @@ router.get('/', getUsers);
 router.get('/:id', getUserById);
 router.post('/', createUser);
 router.put('/:id', updateUser);
+router.put('/:id/password', changePassword);
+router.post('/:id/change-password', changePassword);
 router.delete('/:id', deleteUser);
 
 export default router;
