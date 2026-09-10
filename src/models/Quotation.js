@@ -26,6 +26,7 @@ const QuotationSchema = new Schema(
     customerEmail: { type: String, default: '' },
     customerPhone: { type: String, default: '' },
     customerCompany: { type: String, default: '' },
+    customerAddress: { type: String, default: '' },
     eventType: { type: String, default: 'Wedding' },
     eventDate: { type: String, default: () => new Date().toISOString().split('T')[0] },
     validUntil: { type: String, default: () => new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0] },

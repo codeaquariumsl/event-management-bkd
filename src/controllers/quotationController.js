@@ -127,7 +127,7 @@ export const convertToEvent = async (req, res) => {
       startTime: '18:00',
       endTime: '23:30',
       location: quotation.venue || 'TBD',
-      address: quotation.venue || '',
+      address: quotation.customerAddress || quotation.venue || '',
       status: 'Confirmed',
       services,
       assignedStaff: [],
