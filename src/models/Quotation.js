@@ -45,6 +45,7 @@ const QuotationSchema = new Schema(
     notes: { type: String, default: '' },
     termsAndConditions: { type: String, default: '' },
     convertedEventId: { type: String, default: null },
+    convertedEventIds: { type: [String], default: [] },
   },
   {
     timestamps: true,

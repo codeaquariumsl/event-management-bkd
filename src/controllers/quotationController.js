@@ -152,9 +152,15 @@ export const convertToEvent = async (req, res) => {
 
     const savedEvent = await newEvent.save();
 
-    // Update quotation status to Accepted and record convertedEventId
+    // Update quotation status to Accepted and record convertedEventId & convertedEventIds
     quotation.status = 'Accepted';
     quotation.convertedEventId = eventId;
+    if (!Array.isArray(quotation.convertedEventIds)) {
+      quotation.convertedEventIds = [];
+    }
+    if (!quotation.convertedEventIds.includes(eventId)) {
+      quotation.convertedEventIds.push(eventId);
+    }
     await quotation.save();
 
     res.json({
