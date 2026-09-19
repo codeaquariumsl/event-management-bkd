@@ -37,7 +37,7 @@ export const getEvents = async (req, res) => {
       filter.customerId = req.query.customerId;
     }
 
-    const events = await EventModel.find(filter).sort({ eventDate: 1 });
+    const events = await EventModel.find(filter).sort({ createdAt: -1 });
     res.json(events);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching events', error });
