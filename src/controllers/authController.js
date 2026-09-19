@@ -1,8 +1,20 @@
 import crypto from 'crypto';
 import { UserModel } from '../models/User.js';
+import { RoleModel } from '../models/Role.js';
+import { ROLE_DEFAULT_PERMISSIONS } from './userController.js';
 
 // In-memory token-to-user cache for active sessions
 const sessionStore = new Map();
+
+const resolveUserRolePermissions = async (roleName) => {
+  try {
+    const roleDoc = await RoleModel.findOne({ name: roleName });
+    if (roleDoc && Array.isArray(roleDoc.permissions) && roleDoc.permissions.length > 0) {
+      return roleDoc.permissions;
+    }
+  } catch { }
+  return ROLE_DEFAULT_PERMISSIONS[roleName] || [];
+};
 
 export const login = async (req, res) => {
   try {
@@ -43,6 +55,9 @@ export const login = async (req, res) => {
     user.lastLogin = new Date().toLocaleString();
     await user.save();
 
+    // Dynamically resolve permissions from the Role
+    const permissions = await resolveUserRolePermissions(user.role);
+
     res.json({
       success: true,
       token,
@@ -54,7 +69,7 @@ export const login = async (req, res) => {
         status: user.status,
         avatar: user.avatar,
         phone: user.phone,
-        permissions: user.permissions,
+        permissions,
         lastLogin: user.lastLogin,
       },
     });
@@ -86,6 +101,8 @@ export const getMe = async (req, res) => {
       return;
     }
 
+    const permissions = await resolveUserRolePermissions(user.role);
+
     res.json({
       user: {
         id: user.id,
@@ -95,7 +112,7 @@ export const getMe = async (req, res) => {
         status: user.status,
         avatar: user.avatar,
         phone: user.phone,
-        permissions: user.permissions,
+        permissions,
         lastLogin: user.lastLogin,
       },
     });
