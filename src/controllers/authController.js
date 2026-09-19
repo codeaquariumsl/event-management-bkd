@@ -36,7 +36,7 @@ export const login = async (req, res) => {
 
     // Generate secure session token
     const token = `sk_sess_${crypto.randomBytes(24).toString('hex')}`;
-    const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days
+    const expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
 
     sessionStore.set(token, { userId: user.id, expiresAt });
 
@@ -68,23 +68,22 @@ export const getMe = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      res.status(401).json({ message: 'No authorization token provided' });
+      res.status(401).json({ message: 'User session invalid or expired' });
       return;
     }
 
     const token = authHeader.split(' ')[1];
     const session = sessionStore.get(token);
 
-    // If in development or mock token
-    let user;
-    if (session && session.expiresAt > Date.now()) {
-      user = await UserModel.findOne({ id: session.userId });
-    } else {
-      user = await UserModel.findOne({ email: 'admin@seekersentertainment.lk' });
+    if (!session || session.expiresAt <= Date.now()) {
+      res.status(401).json({ message: 'User session invalid or expired' });
+      return;
     }
 
-    if (!user) {
-      res.status(404).json({ message: 'User session invalid or expired' });
+    const user = await UserModel.findOne({ id: session.userId });
+
+    if (!user || user.status === 'Suspended') {
+      res.status(401).json({ message: 'User session invalid or expired' });
       return;
     }
 
