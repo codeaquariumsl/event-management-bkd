@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import { UserModel } from '../models/User.js';
 
 export const ROLE_DEFAULT_PERMISSIONS = {
@@ -104,12 +105,19 @@ export const createUser = async (req, res) => {
       ? req.body.name.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase()
       : 'U';
 
+    let hashedPassword = req.body.password;
+    if (hashedPassword && !hashedPassword.startsWith('$2a$') && !hashedPassword.startsWith('$2b$')) {
+      const salt = await bcrypt.genSalt(10);
+      hashedPassword = await bcrypt.hash(hashedPassword, salt);
+    }
+
     const user = new UserModel({
       ...req.body,
       id: newId,
       avatar: req.body.avatar || initials,
       role,
       permissions,
+      ...(hashedPassword ? { password: hashedPassword } : {}),
     });
 
     const saved = await user.save();
@@ -121,15 +129,22 @@ export const createUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-    const updated = await UserModel.findOneAndUpdate(
-      { id: req.params.id },
-      { $set: req.body },
-      { new: true }
-    );
-    if (!updated) {
+    const user = await UserModel.findOne({ id: req.params.id });
+    if (!user) {
       res.status(404).json({ message: 'User not found' });
       return;
     }
+
+    const updates = { ...req.body };
+    if (!updates.password) {
+      delete updates.password;
+    } else if (!updates.password.startsWith('$2a$') && !updates.password.startsWith('$2b$')) {
+      const salt = await bcrypt.genSalt(10);
+      updates.password = await bcrypt.hash(updates.password, salt);
+    }
+
+    Object.assign(user, updates);
+    const updated = await user.save();
     res.json(updated);
   } catch (error) {
     res.status(500).json({ message: 'Error updating user', error });
@@ -161,8 +176,11 @@ export const changePassword = async (req, res) => {
       res.status(404).json({ message: 'User not found' });
       return;
     }
-    user.password = password;
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
     await user.save();
+
     res.json({ success: true, message: 'Password updated successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error updating password', error });

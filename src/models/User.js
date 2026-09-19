@@ -1,11 +1,12 @@
 import mongoose, { Schema } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const UserSchema = new Schema(
   {
     id: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, default: 'seekers2026' },
+    password: { type: String },
     avatar: { type: String, default: '' },
     phone: { type: String, default: '' },
     role: {
@@ -41,5 +42,29 @@ const UserSchema = new Schema(
     },
   }
 );
+
+// Hash password with bcrypt before saving to MongoDB
+UserSchema.pre('save', async function () {
+  if (!this.isModified('password') || !this.password) {
+    return;
+  }
+
+  // If already hashed with bcrypt, do not double-hash
+  if (this.password.startsWith('$2a$') || this.password.startsWith('$2b$')) {
+    return;
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Compare entered password with stored bcrypt hash
+UserSchema.methods.comparePassword = async function (candidatePassword) {
+  if (!this.password) return false;
+  if (this.password.startsWith('$2a$') || this.password.startsWith('$2b$')) {
+    return await bcrypt.compare(candidatePassword, this.password);
+  }
+  return this.password === candidatePassword;
+};
 
 export const UserModel = mongoose.model('User', UserSchema);

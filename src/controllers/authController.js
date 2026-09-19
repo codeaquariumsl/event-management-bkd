@@ -25,11 +25,10 @@ export const login = async (req, res) => {
       return;
     }
 
-    // Check password
-    const isDefaultPassword = password === 'seekers2026';
-    const isMatchingPassword = user.password && user.password === password;
+    // Check password with bcrypt comparison
+    const isMatchingPassword = await user.comparePassword(password);
 
-    if (!isMatchingPassword && !isDefaultPassword) {
+    if (!isMatchingPassword) {
       res.status(401).json({ message: 'Invalid email or password' });
       return;
     }
