@@ -80,7 +80,7 @@ export const getStaff = async (req, res) => {
             pendingPayments: m.pendingPayments,
           },
         }
-      ).catch(() => {});
+      ).catch(() => { });
     });
 
     res.json(enriched);
@@ -185,8 +185,8 @@ export const getPayrollSummary = async (req, res) => {
         .filter((p) => p.staffId === member.id)
         .reduce((sum, p) => sum + p.paidAmount, 0);
 
-      const overtime = member.employmentType === 'Full Time' ? Math.round(basic * 0.08) : 0;
-      const bonus = memberEvents.length > 5 ? 15000 : 0;
+      const overtime = 0; //member.employmentType === 'Full Time' ? Math.round(basic * 0.08) : 0;
+      const bonus = 0;    //memberEvents.length > 5 ? 15000 : 0;
       const deductions = 0;
       const advance = 0;
 
