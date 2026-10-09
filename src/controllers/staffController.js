@@ -165,7 +165,15 @@ export const getPayrollSummary = async (req, res) => {
     const staffList = await StaffModel.find();
     const events = await EventModel.find({ eventDate: { $regex: `^${monthYear}` } });
     const payments = await StaffPaymentModel.find({
-      date: { $regex: `^${monthYear}` },
+      $or: [
+        { monthYear: monthYear },
+        {
+          $and: [
+            { $or: [{ monthYear: '' }, { monthYear: null }, { monthYear: { $exists: false } }] },
+            { date: { $regex: `^${monthYear}` } },
+          ],
+        },
+      ],
       status: 'Paid',
     });
 

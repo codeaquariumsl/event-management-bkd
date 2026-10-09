@@ -80,9 +80,12 @@ export const recordStaffPayment = async (req, res) => {
       newId = `PAY-STF-${String(seq).padStart(3, '0')}`;
     }
 
+    const monthYear = req.body.monthYear || (req.body.date ? req.body.date.slice(0, 7) : new Date().toISOString().slice(0, 7));
+
     const payment = new StaffPaymentModel({
       ...req.body,
       id: newId,
+      monthYear,
       paidAmount: Number(req.body.paidAmount || req.body.amount),
       balance: Math.max(0, Number(req.body.amount) - Number(req.body.paidAmount || req.body.amount)),
     });
@@ -106,3 +109,50 @@ export const recordStaffPayment = async (req, res) => {
     res.status(500).json({ message: 'Error recording staff payment', error });
   }
 };
+
+export const updateStaffPayment = async (req, res) => {
+  try {
+    const updated = await StaffPaymentModel.findOneAndUpdate(
+      { id: req.params.id },
+      { $set: req.body },
+      { new: true }
+    );
+    if (!updated) {
+      res.status(404).json({ message: 'Staff payment not found' });
+      return;
+    }
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating staff payment', error });
+  }
+};
+
+export const deleteStaffPayment = async (req, res) => {
+  try {
+    const payment = await StaffPaymentModel.findOneAndDelete({ id: req.params.id });
+    if (!payment) {
+      res.status(404).json({ message: 'Staff payment not found' });
+      return;
+    }
+
+    // If linked to event and staff, adjust assignedStaff
+    if (payment.eventId && payment.staffId) {
+      const event = await EventModel.findOne({ id: payment.eventId });
+      if (event) {
+        const asIdx = event.assignedStaff.findIndex((as) => as.staffId === payment.staffId);
+        if (asIdx >= 0) {
+          event.assignedStaff[asIdx].paidAmount = Math.max(
+            0,
+            (event.assignedStaff[asIdx].paidAmount || 0) - (payment.paidAmount || payment.amount || 0)
+          );
+          await event.save();
+        }
+      }
+    }
+
+    res.json({ success: true, message: 'Staff payment deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting staff payment', error });
+  }
+};
+
