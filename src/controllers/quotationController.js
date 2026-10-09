@@ -9,7 +9,15 @@ export const getQuotations = async (req, res) => {
     if (status && status !== 'All') filter.status = status;
     if (customerId) filter.customerId = customerId;
 
-    const quotations = await QuotationModel.find(filter).sort({ createdAt: -1 });
+    let quotations;
+    try {
+      quotations = await QuotationModel.find(filter)
+        .collation({ locale: 'en', numericOrdering: true })
+        .sort({ quotationNumber: -1, createdAt: -1 });
+    } catch {
+      quotations = await QuotationModel.find(filter).sort({ quotationNumber: -1, createdAt: -1 });
+    }
+
     res.json(quotations);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching quotations', error: error.message });
